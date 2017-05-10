@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="vsc.vic.githubres.vo.RecycleViewVo"/>
+        <variable
+            name="item"
+            type="RecycleViewVo"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <CheckBox
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:id="@+id/check_select"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center" />
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/iv_image"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="16sp"
+            android:layout_marginEnd="16sp"
+            android:layout_marginBottom="16sp"
+            fresco:actualImageScaleType="centerCrop"
+            android:src="@{item.giftPhoto}"
+            fresco:placeholderImage="@drawable/placeholder"
+            fresco:placeholderImageScaleType="centerCrop" />
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textColor="#313131"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="14sp"
+                android:text="@{item.giftName}" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textColor="#313131"
+                    android:text="@{item.giftPrice}"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#313131"
+                    android:paddingLeft="10dp"
+                    android:text="积分"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="90dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/chooser"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/newpart_delete"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1" />
+
+                <TextView
+                    android:id="@+id/newpart_number"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.5"
+                    android:gravity="center"
+                    android:hint="0"
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:text="@{item.giftAmount}"
+                    android:textColor="#313131"
+                    android:inputType="number" />
+
+                <TextView
+                    android:id="@+id/newpart_add"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

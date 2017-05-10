@@ -6,10 +6,13 @@ import android.os.Handler;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import vsc.vic.githubres.BR;
@@ -18,13 +21,14 @@ import vsc.vic.githubres.untils.Action;
 import vsc.vic.githubres.untils.ActionItemView;
 import vsc.vic.githubres.untils.CallAction;
 import vsc.vic.githubres.untils.ViewHolder;
+import vsc.vic.githubres.untils.doTouchCallBack;
 
 
 /**
  *
  * 通用Adapter
  */
-public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
+public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements doTouchCallBack {
 
     private List<T> mDataSet;
     private int mResource;
@@ -32,6 +36,7 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
     private boolean mIsGetClickView;//是否需要获取点击的view项
     private ActionItemView<Integer> onViewItemClick;//需要返回view
     private Action<Integer> mOnItemClick;//不要返回view
+    private boolean isLoading;
 
 
     public CommonAdapter(int resource, List<T> mDataSet) {
@@ -59,25 +64,22 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view  = inflater.inflate(mLoadMore==1 ? R.layout.item_load : mResource,parent,false);
+        Log.e("LOG_TAG","viewType"+viewType);
+        View view  = inflater.inflate(viewType==-1 ? R.layout.item_load : mResource,parent,false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final int p = position;
         ViewDataBinding binding = holder.getmBinding();//获取binding
         binding.setVariable(BR.item,mDataSet.get(position));//设置数据源
         binding.executePendingBindings();//执行绑定
         if(mOnItemClick!=null){
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mIsGetClickView){
-                        mOnItemClick.onItemClick(p);
-                    }else{
-                        onViewItemClick.onItemClick(v,p);
-                    }
+            holder.itemView.setOnClickListener(v -> {
+                if(mIsGetClickView){
+                    mOnItemClick.onItemClick(position);
+                }else{
+                    onViewItemClick.onItemClick(v,position);
                 }
             });
 
@@ -87,7 +89,14 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+        if(mDataSet!=null){
+            if(mDataSet.size()==position+1&&mDataSet.get(position)==null){
+                return -1;
+            }
+        }
+            return super.getItemViewType(position);
+
+
     }
 
     @Override
@@ -100,12 +109,10 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
     public void onItemClickLisener(Action<Integer> onItemClick) {
         this.mOnItemClick = onItemClick;
     }
-    public void onItemClickLisener(ActionItemView<Integer> onItemClick) {
-        this.onViewItemClick = onItemClick;
-    }
+    public void onItemClickLisener(ActionItemView<Integer> onItemClick) {this.onViewItemClick = onItemClick;}
 
     //加载更多
-    protected void setLoadMoreAction(RecyclerView recyclerView, final CallAction action){
+    public void setLoadMoreAction(RecyclerView recyclerView, CallAction action){
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -122,7 +129,8 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
                     LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
                     lastItem = linearLayoutManager.findLastVisibleItemPosition();
                 }
-                if(itemCount<=lastItem+1){
+                if(!isLoading&&itemCount<=lastItem+1){
+                    isLoading = true;
                     mDataSet.add(null);
                     notifyDataSetChanged();
                     new Handler().postDelayed(action::call,2000);
@@ -132,7 +140,25 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
 
     }
 
+    public void reset() {
+        isLoading = false;
+        if (mDataSet.remove(null)) {
+            notifyDataSetChanged();
+        }
+    }
 
+    @Override
+    public void doMoveAction(int fromPosiion, int toPosiion) {
+        //进行滑动的时候具体操作
+        Collections.swap(mDataSet,fromPosiion,toPosiion);
+        notifyItemMoved(fromPosiion,toPosiion);
+    }
 
+    @Override
+    public void doSwipAction(int posiion) {
+        //进行拖拽的时候具体操作
+        mDataSet.remove(posiion);
+        notifyItemRemoved(posiion);
+    }
 }
 
