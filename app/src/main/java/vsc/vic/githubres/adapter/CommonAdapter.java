@@ -113,11 +113,13 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> implement
 
     //加载更多
     public void setLoadMoreAction(RecyclerView recyclerView, CallAction action){
-
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy<10){
+                    return;
+                }
                 int lastItem = 0;
                 RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
                 int itemCount = layoutManager.getItemCount();
@@ -137,7 +139,6 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<ViewHolder> implement
                 }
             }
         });
-
     }
 
     public void reset() {
