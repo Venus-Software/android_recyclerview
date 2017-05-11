@@ -1,6 +1,7 @@
 package vsc.vic.githubres.ui;
 
 import android.databinding.DataBindingUtil;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -42,11 +43,22 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        //上拉加载
         adapter.setLoadMoreAction(mBinding.recycleView, new CallAction() {
             @Override
             public void call() {
                 Toast.makeText(MainActivity.this,"加载更多",Toast.LENGTH_SHORT).show();
                 adapter.reset();
+            }
+        });
+        //下拉刷新
+
+        mBinding.refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mBinding.refresh.setRefreshing(false);
+                Toast.makeText(MainActivity.this,"刷新界面",Toast.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
             }
         });
         //上下滑动交换位置，左右滑动删除单项
